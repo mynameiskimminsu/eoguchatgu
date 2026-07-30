@@ -1,11 +1,70 @@
-<!doctype html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#063f4a"><title>어구찾구</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body><main class="app-shell"><header class="topbar"><button class="icon-button back" aria-label="뒤로 가기">‹</button><div class="brand"><span class="brand-mark">⌁</span> 어구찾구</div><button class="icon-button" aria-label="알림">♧</button></header>
-<section id="home" class="screen active" aria-label="홈"><div class="hero"><p class="eyebrow">바다를 지키는 작은 기록</p><h1>어구찾구</h1><p class="hero-copy">버려지는 어구를 찾고 기록해<br>더 깨끗한 바다를 만듭니다.</p><div class="ocean-art"><span class="sun"></span><span class="cloud cloud-one"></span><span class="cloud cloud-two"></span><span class="boat">⛵</span><span class="wave wave-one"></span><span class="wave wave-two"></span></div></div><article class="impact-card"><div class="impact-icon">♻</div><div><p>어구찾구와 함께 줄인 탄소 배출량</p><strong><span id="carbonCount">2,846</span> <small>kg CO₂e</small></strong><span class="impact-sub">소나무 431그루가 1년간 흡수하는 양이에요</span></div></article><div class="menu-grid"><button class="menu-card current" data-target="current"><span class="menu-icon">≋</span><b>해류 분석</b><small>내 주변 바다 흐름 보기</small></button><button class="menu-card weather" data-target="weather"><span class="menu-icon">☀</span><b>기상 상황</b><small>바다 날씨와 특보 확인</small></button><button class="menu-card gear" data-target="gear"><span class="menu-icon">▣</span><b>어구 정보</b><small>QR코드로 어구 확인</small></button><button class="menu-card points-menu" data-target="points"><span class="menu-icon">P</span><b>포인트 조회</b><small>내 포인트를 확인하세요</small></button></div></section>
-<section id="points" class="screen detail-screen" aria-label="포인트 조회"><div class="section-heading"><p class="eyebrow">MY REWARD</p><h2>포인트 조회</h2><p>로그인 후 내 포인트를 확인할 수 있어요.</p></div><article id="loginCard" class="login-card"><span>🔐</span><h3>포인트 계정 로그인</h3><p>첫 사용자는 자동으로 <b>0 P</b>에서 시작합니다.</p><input id="loginId" aria-label="아이디" placeholder="아이디"><input id="loginPassword" type="password" aria-label="비밀번호" placeholder="비밀번호"><button id="loginButton" class="primary-button">로그인하고 포인트 조회</button><small id="loginMessage">처음이라면 원하는 아이디와 비밀번호를 입력해 주세요.</small></article><div id="pointPanel" class="hidden"><article class="points-summary"><span>P</span><p>현재 보유 포인트</p><strong><span class="points-value">0</span> P</strong><small>지역화폐 전환까지 <span id="pointsRemaining">1,000</span> P 남았어요</small></article><article class="code-card"><span class="collection-icon">♧</span><h3>회수 코드 입력</h3><p>집하장에서 어구를 회수하고 받은 코드를 입력해서 포인트 현황을 업데이트하세요.</p><div class="code-row"><input id="collectionCode" aria-label="회수 코드" placeholder="예: FISH-2026"><button id="codeButton">적립</button></div><small id="codeMessage">코드 1건당 최대 320 P가 적립됩니다.</small></article></div></section>
-<section id="gear" class="screen detail-screen" aria-label="어구 정보"><div class="section-heading"><p class="eyebrow">GEAR TRACKING</p><h2>어구 정보</h2><p>어구에 부착된 QR코드를 인식해 주세요.</p></div><div class="scanner" id="scanner"><video id="camera" autoplay muted playsinline></video><div class="scan-empty"><span>▣</span><p>QR코드를 네모 안에 맞춰주세요</p></div><div class="scan-frame"><i></i><i></i><i></i><i></i></div><div class="scan-line"></div></div><p id="cameraStatus" class="camera-status">카메라를 켜서 QR코드를 인식할 수 있어요.</p><button id="cameraButton" class="primary-button">카메라로 인식하기</button><button id="demoScanButton" class="text-button">체험용 QR코드 인식하기</button><article id="gearResult" class="result-card hidden"><div class="result-title"><span>✓</span><div><p>인식 완료</p><h3>통발 어구</h3></div><em>정상 등록</em></div><dl><div><dt>어구 번호</dt><dd>FG-24-0518-029</dd></div><div><dt>구매자</dt><dd>김해수</dd></div><div><dt>구매 일자</dt><dd>2026. 05. 18.</dd></div><div><dt>등록 어항</dt><dd id="gearHarbor">내 위치 인근 항구</dd></div></dl></article></section>
-<section id="current" class="screen detail-screen" aria-label="해류 분석"><div class="section-heading"><p class="eyebrow">OCEAN CURRENT</p><h2>해류 분석</h2><p><span class="sea-name">사용자 주변 바다</span>를 기준으로 분석했어요.</p></div><div class="map-card"><iframe id="currentMap" title="주변 바다 Google 지도" loading="lazy" src="https://www.google.com/maps?q=Korea+sea&z=6&output=embed"></iframe><span class="map-caption"><b class="sea-name">사용자 주변 바다</b><small>Google 지도</small></span></div><div class="data-panel"><div><span>유향</span><strong id="currentDirection">--</strong></div><div><span>유속</span><strong id="currentSpeed">--</strong></div></div><article class="tip-card"><span>💡</span><p><b>안전 안내</b><br><span id="currentTip">위치 정보를 허용하면 맞춤 해류 정보를 제공해요.</span></p></article></section>
-<section id="weather" class="screen detail-screen" aria-label="기상 상황"><div class="section-heading"><p class="eyebrow">MARINE WEATHER</p><h2>기상 상황</h2><p><span class="sea-name">사용자 주변 바다</span>의 기상 정보예요.</p></div><div class="map-card weather-map-card"><iframe id="weatherMap" title="주변 바다 Google 지도" loading="lazy" src="https://www.google.com/maps?q=Korea+sea&z=6&output=embed"></iframe><span class="map-caption"><b class="sea-name">사용자 주변 바다</b><small>Google 지도</small></span></div><div class="alert"><span>!</span><p><b id="weatherAlert">위치 정보 필요</b><br><span id="weatherAlertCopy">현재 위치를 허용하면 맞춤 기상 정보를 제공해요.</span></p></div><div class="weather-stats"><div><span>풍속</span><b id="windSpeed">--</b></div><div><span>풍향</span><b id="windDirection">--</b></div><div><span>파고</span><b id="waveHeight">--</b></div></div></section>
-<section id="complete" class="screen detail-screen complete-screen" aria-label="이용 의견"><div class="complete-art"><span>⚓</span><i>〰〰〰</i><b>🐟</b></div><p class="eyebrow">THANK YOU</p><h2>모든 정보를 확인했어요!</h2><p>어구찾구를 통해 어구의 위치를 파악하는 것이 도움이 되셨나요?</p><div class="feedback-buttons"><button data-feedback="도움 됐어요">도움 됐어요</button><button data-feedback="다음에 확인할게요">다음에 확인할게요</button></div><small id="returnMessage">3초 뒤 처음 화면으로 돌아갑니다.</small></section>
-<nav class="bottom-nav" aria-label="주요 메뉴"><button class="nav-active" data-target="home"><span>⌂</span>홈</button><button data-target="current"><span>≋</span>해류</button><button data-target="weather"><span>☀</span>날씨</button><button data-target="gear"><span>▣</span>어구</button></nav></main>
-<div id="introModal" class="info-modal"><div><span class="gear-illustration">🎣</span><p class="eyebrow">BEFORE YOU START</p><h2>어구란 무엇일까요?</h2><p><b>어구</b>는 물고기와 해산물을 잡기 위해 쓰는 도구예요. 그물·통발·낚싯줄 등이 있으며, 바다에 오래 남으면 해양 생물에게 위험할 수 있어요.</p><p>어구찾구는 어구의 정보를 기록하고, 잃어버린 어구를 더 빨리 찾도록 돕습니다.</p><button id="introNext" class="primary-button">확인했어요</button></div></div>
-<div id="locationModal" class="location-modal hidden"><div><span class="location-modal-icon">⌖</span><p class="eyebrow">PERSONALIZED OCEAN INFO</p><h2>현재 위치를 사용할까요?</h2><p>내 위치에 맞는 해류 분석과 기상 상황을 안내해 드릴게요.</p><button id="locationAllow" class="primary-button">위치 정보 허용하기</button><button id="locationSkip" class="text-button">나중에 할게요</button></div></div>
-<div id="qrInfoModal" class="info-modal hidden"><div><span class="gear-illustration">▣</span><p class="eyebrow">WHY QR?</p><h2>어구 QR코드 안내</h2><p>어구에 붙은 QR코드는 어구를 잃어버렸거나 버려졌을 때 등록된 사용자를 다시 추적하고, 어구의 종류·구매 정보 등을 확인하기 위한 표식입니다.</p><button id="qrInfoClose" class="primary-button">QR 인식 시작하기</button></div></div><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>플로겟</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar"><span class="logo-mark">◒</span><span>플로겟</span><button aria-label="알림">♧</button></header>
+
+    <section class="hero">
+      <p class="eyebrow">BEACH CLEANUP COMMUNITY</p>
+      <h1>깨끗한 파도,<br>우리의 약속</h1>
+      <p>광안리 해변을 위한 작은 실천을<br>오늘부터 함께 시작해요.</p>
+      <div class="hero-badge"><span>✦</span> GWANGALLI</div>
+    </section>
+
+    <section class="intro"><p>함께할 수 있는 활동을 선택해 보세요.</p><b>오늘의 플로겟</b></section>
+    <section class="menu-grid" aria-label="봉사 활동 메뉴">
+      <button class="menu-card join" data-name="봉사참여"><span>🗑</span><b>봉사참여</b><small>해변 정화 활동 신청하기</small><i>→</i></button>
+      <button class="menu-card follow" data-name="후속활동"><span>⌁</span><b>후속활동</b><small>수거 기록과 인증하기</small><i>→</i></button>
+      <button class="menu-card weather" data-name="기상상황"><span>☀</span><b>기상상황</b><small>광안리 바다 날씨 확인</small><i>→</i></button>
+      <button class="menu-card points" data-name="포인트조회"><span>P</span><b>포인트조회</b><small>내 포인트를 확인하세요</small><i>→</i></button>
+    </section>
+    <p class="notice" id="notice" aria-live="polite">메뉴를 선택해 활동을 시작해 보세요.</p>
+  </main>
+  <section class="start-login" id="startLogin" aria-label="로그인">
+    <form id="startLoginForm" class="start-login-card">
+      <span>◒</span>
+      <p>GWANGALLI BEACH MATE</p>
+      <h1>반가워요!</h1>
+      <strong>플로겟에 로그인해 주세요.</strong>
+      <label>아이디<input required name="id" maxlength="20" placeholder="아이디를 입력하세요" /></label>
+      <label>비밀번호<input required name="password" type="password" minlength="4" placeholder="비밀번호를 입력하세요" /></label>
+      <button type="submit">로그인하고 시작하기</button>
+      <button type="button" class="signup-link" id="showSignup">회원가입</button>
+      <small id="loginMessage">회원가입한 아이디로 로그인해 주세요.</small>
+    </form>
+    <form id="signupForm" class="start-login-card hidden">
+      <span>✦</span>
+      <p>CREATE ACCOUNT</p>
+      <h1>회원가입</h1>
+      <strong>플로겟 계정을 만들어 주세요.</strong>
+      <label>아이디<input required name="id" maxlength="20" placeholder="아이디를 입력하세요" /></label>
+      <label>비밀번호<input required name="password" type="password" minlength="4" placeholder="4자 이상 입력하세요" /></label>
+      <label>비밀번호 확인<input required name="confirm" type="password" minlength="4" placeholder="비밀번호를 다시 입력하세요" /></label>
+      <button type="submit">회원가입 완료</button>
+      <button type="button" class="signup-link" id="showLogin">로그인으로 돌아가기</button>
+      <small id="signupMessage">가입 정보는 이 브라우저에 저장됩니다.</small>
+    </form>
+  </section>
+  <section class="modal" id="activityModal" aria-hidden="true">
+    <article class="modal-card">
+      <button class="close" aria-label="닫기">×</button>
+      <span id="modalIcon" class="modal-icon">🗑</span>
+      <p class="eyebrow" id="modalLabel">BEACH VOLUNTEER</p>
+      <h2 id="modalTitle">봉사참여</h2>
+      <p id="modalDescription"></p>
+      <div id="modalInfo" class="modal-info"></div>
+      <div id="modalActions"><button class="action-button" id="modalAction">확인했어요</button></div>
+    </article>
+  </section>
+  <script src="app.js"></script>
+</body>
+</html>
