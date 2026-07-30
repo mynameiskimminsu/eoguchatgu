@@ -1,3 +1,9 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+
+const firebaseApp=initializeApp({apiKey:'AIzaSyDSGih4EfBz4yO97V3-atDUxywL7NkuL9Q',authDomain:'ploget-f2ca9.firebaseapp.com',projectId:'ploget-f2ca9',storageBucket:'ploget-f2ca9.firebasestorage.app',messagingSenderId:'668637351138',appId:'1:668637351138:web:b3acf4f1f7e26f0596e2bb'});
+const firebaseAuth=getAuth(firebaseApp),firestore=getFirestore(firebaseApp);
 let points=1240, cameraStream=null, photoCaptured=false, bagConfirmed=false, currentUser='', lastCleanupKind='', trackingId=null, lastPosition=null, gpsDistance=0, gpsVerified=false;
 const startLogin=document.querySelector('#startLogin');
 const loginForm=document.querySelector('#startLoginForm'),signupForm=document.querySelector('#signupForm');
