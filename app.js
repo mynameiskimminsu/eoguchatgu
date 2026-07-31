@@ -23,7 +23,7 @@ function modal(icon,label,title,description,html='') {
 function closeModal(){ $('#activityModal').classList.remove('open'); $('#activityModal').setAttribute('aria-hidden','true'); }
 function action(text, handler, secondary=false) { const b=document.createElement('button'); b.textContent=text; b.className=secondary?'secondary-action':'action-button'; b.onclick=handler; $('#modalActions').append(b); }
 async function audit(kind, roomId, details={}) { if (!me) return; await setDoc(doc(collection(db,'auditLogs')), {kind,roomId:roomId||null,actorId:me.uid,details,createdAt:serverTimestamp()}); }
-async function profile() { const s=await getDoc(doc(db,'users',me.uid)); myProfile=s.data()||null; return myProfile; }
+async function profile() { const ref=doc(db,'users',me.uid), s=await getDoc(ref); if(!s.exists()){const id=(me.email||'member').replace('@ploget.app','');myProfile={normalizedId:id,displayId:id,points:0,activeRoomId:null,hostedRoomId:null};await setDoc(ref,{...myProfile,createdAt:serverTimestamp()});}else myProfile=s.data(); return myProfile; }
 async function clearExpiredPenalty(tx, userRef) {
   const pRef=doc(db,'penalties',me.uid), p=await tx.get(pRef);
   if (p.exists() && p.data().active) { if ((p.data().expiresAt||0)>now()) throw new Error(`5분 이용 제한 중입니다. ${Math.ceil((p.data().expiresAt-now())/60000)}분 후 다시 시도해 주세요.`); tx.update(pRef,{active:false,releasedAt:serverTimestamp()}); }
