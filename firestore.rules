@@ -8,7 +8,8 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if signedIn();
       allow create: if me(uid);
-      allow update: if me(uid) && request.resource.data.normalizedId == resource.data.normalizedId && request.resource.data.points >= resource.data.points && request.resource.data.points <= resource.data.points + 5000;
+      allow update: if (me(uid) && request.resource.data.normalizedId == resource.data.normalizedId && request.resource.data.points == resource.data.points)
+        || (resource.data.activeRoomId != null && host(resource.data.activeRoomId) && request.resource.data.normalizedId == resource.data.normalizedId && request.resource.data.points >= resource.data.points && request.resource.data.points <= resource.data.points + 5000 && request.resource.data.activeRoomId == null);
     }
     match /usernames/{id} { allow read: if signedIn(); allow create: if signedIn() && request.resource.data.uid == request.auth.uid; allow update: if me(resource.data.uid); }
     match /rooms/{roomId} {
@@ -17,8 +18,8 @@ service cloud.firestore {
       allow update: if signedIn() && request.resource.data.hostId == resource.data.hostId && (host(roomId) || (request.resource.data.participantCount >= 0 && request.resource.data.participantCount <= resource.data.capacity));
       match /participants/{uid} { allow read: if signedIn(); allow create: if me(uid) || host(roomId); allow update: if me(uid) || host(roomId); }
       match /attendance/{uid} { allow read: if signedIn(); allow create: if host(roomId) || (me(uid) && request.resource.data.status == 'pending'); allow update: if host(roomId); }
-      match /followups/{uid} { allow read: if me(uid) || host(roomId); allow create: if me(uid) && get(/databases/$(database)/documents/rooms/$(roomId)/participants/$(uid)).data.status == 'attended'; }
-      match /pointClaims/{uid} { allow read: if me(uid) || host(roomId); allow create: if me(uid); }
+      match /followups/{uid} { allow read: if me(uid) || host(roomId); allow create: if me(uid) && get(/databases/$(database)/documents/rooms/$(roomId)/participants/$(uid)).data.status == 'attended'; allow update: if host(roomId) && resource.data.status == 'pending_approval' && request.resource.data.status == 'approved'; }
+      match /pointClaims/{uid} { allow read: if me(uid) || host(roomId); allow create: if host(roomId); }
     }
     match /penalties/{uid} { allow read: if me(uid); allow create, update: if signedIn() && host(request.resource.data.roomId); }
     match /auditLogs/{logId} { allow create: if signedIn() && request.resource.data.actorId == request.auth.uid; allow read: if signedIn(); }
