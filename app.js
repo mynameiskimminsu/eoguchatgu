@@ -81,15 +81,15 @@ async function openPoints(){const p=await profile();modal('P','MY POINTS','포�
 async function openWeather(){
   modal('☀','GWANGALLI WEATHER','광안리 기상상황','광안리 주변의 실시간 날씨를 불러오는 중입니다.',`<div class="weather-now"><span>⏳</span><div><b>광안리 해변</b><strong>불러오는 중</strong><small>잠시만 기다려 주세요.</small></div></div>`);
   try {
-    const [weatherRes,airRes]=await Promise.all([
-      fetch('https://api.open-meteo.com/v1/forecast?latitude=35.1532&longitude=129.1187&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=Asia%2FSeoul'),
-      fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=35.1532&longitude=129.1187&current=pm10,pm2_5&timezone=Asia%2FSeoul')
+    const requestTime=Date.now(); const [weatherRes,airRes]=await Promise.all([
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=35.1532&longitude=129.1187&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=Asia%2FSeoul&cacheBust=${requestTime}`,{cache:'no-store'}),
+      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=35.1532&longitude=129.1187&current=pm10,pm2_5&timezone=Asia%2FSeoul&cacheBust=${requestTime}`,{cache:'no-store'})
     ]);
     if(!weatherRes.ok||!airRes.ok) throw new Error('날씨 정보를 불러오지 못했습니다.');
     const [weather,air]=await Promise.all([weatherRes.json(),airRes.json()]), w=weather.current, a=air.current;
     const codes={0:['☀','맑음'],1:['🌤','대체로 맑음'],2:['⛅','구름 조금'],3:['☁','흐림'],45:['🌫','안개'],51:['🌦','이슬비'],61:['🌧','비'],71:['🌨','눈'],80:['🌦','소나기'],95:['⛈','뇌우']}; const [icon,condition]=codes[w.weather_code]||['🌤','날씨 확인'];
     const dust=a.pm2_5<=15?'좋음':a.pm2_5<=35?'보통':a.pm2_5<=75?'나쁨':'매우 나쁨';
-    modal(icon,'GWANGALLI WEATHER','광안리 기상상황',`${weather.current.time.replace('T',' ')} 기준 실시간 정보입니다.`, `<div class="weather-now"><span>${icon}</span><div><b>광안리 해변 · ${condition}</b><strong>${Math.round(w.temperature_2m)}°</strong><small>체감 ${Math.round(w.apparent_temperature)}° · 풍속 ${Math.round(w.wind_speed_10m)} km/h</small></div></div><div class="dust-status"><span>미세먼지</span><b>${dust}</b><small>PM10 ${Math.round(a.pm10)}㎍/㎥ · PM2.5 ${Math.round(a.pm2_5)}㎍/㎥</small></div><p class="weather-tip">날씨·대기질: Open-Meteo 실시간 데이터. 출발 전 Google 날씨로도 다시 확인해 주세요.</p><a class="secondary-action weather-link" target="_blank" rel="noopener" href="https://www.google.com/search?q=%EA%B4%91%EC%95%88%EB%A6%AC+%EB%82%A0%EC%94%A8">Google에서 광안리 날씨 확인</a>`);
+    modal(icon,'GWANGALLI WEATHER','광안리 기상상황',`${weather.current.time.replace('T',' ')} 기준으로 새로 조회했습니다.`, `<div class="weather-now"><span>${icon}</span><div><b>광안리 해변 · ${condition}</b><strong>${w.temperature_2m.toFixed(1)}°</strong><small>체감 ${w.apparent_temperature.toFixed(1)}° · 풍속 ${w.wind_speed_10m.toFixed(1)} km/h</small></div></div><div class="dust-status"><span>미세먼지</span><b>${dust}</b><small>PM10 ${a.pm10.toFixed(1)}㎍/㎥ · PM2.5 ${a.pm2_5.toFixed(1)}㎍/㎥</small></div><p class="weather-tip">무료 Open-Meteo API에서 매번 새로 가져온 광안리 좌표 기반 데이터입니다.</p>`);
   } catch(err) { modal('⚠','GWANGALLI WEATHER','광안리 기상상황','실시간 날씨 정보를 불러오지 못했습니다.',`<p class="weather-tip">인터넷 연결을 확인한 뒤 다시 시도해 주세요.</p><a class="secondary-action weather-link" target="_blank" rel="noopener" href="https://www.google.com/search?q=%EA%B4%91%EC%95%88%EB%A6%AC+%EB%82%A0%EC%94%A8">Google에서 광안리 날씨 확인</a>`); }
 }
 function renderCalendar(){const m=new Date(), y=m.getFullYear(),mo=m.getMonth(),done=JSON.parse(localStorage.getItem('ploget-volunteer-days')||'[]');$('#calendarMonth').textContent=`${y}.${String(mo+1).padStart(2,'0')} 봉사 달력`;$('#calendarDays').innerHTML='<span></span>'.repeat(new Date(y,mo,1).getDay())+Array.from({length:new Date(y,mo+1,0).getDate()},(_,i)=>{const d=i+1,key=`${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;return `<span class="${done.includes(key)?'done':''}">${d}</span>`}).join('');}
