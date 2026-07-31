@@ -18,7 +18,7 @@ const msg = (id,text,error=false) => { const el=$(id); el.textContent=text; el.s
 
 function modal(icon,label,title,description,html='') {
   $('#modalIcon').textContent=icon; $('#modalLabel').textContent=label; $('#modalTitle').textContent=title;
-  $('#modalDescription').textContent=title==='봉사활동 개최'?'집결 시간과 모집 마감만 설정하세요. 실제 봉사 시간은 실행할 때 방장이 정합니다.':description; $('#modalInfo').innerHTML=html; $('#modalInfo').querySelector('input[name="end"]')?.closest('label')?.remove(); $('#modalActions').innerHTML='';
+  $('#modalDescription').textContent=title==='봉사활동 개최'?'모집 마감만 설정하세요. 정원이 모두 차면 방장이 실제 봉사 시간을 정해 실행합니다.':description; $('#modalInfo').innerHTML=html; $('#modalInfo').querySelector('input[name="end"]')?.closest('label')?.remove(); $('#modalInfo').querySelector('input[name="start"]')?.closest('label')?.remove(); $('#modalActions').innerHTML='';
   $('#activityModal').classList.add('open'); $('#activityModal').setAttribute('aria-hidden','false');
 }
 function closeModal(){ if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;} if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;} $('#activityModal').classList.remove('open'); $('#activityModal').setAttribute('aria-hidden','true'); }
@@ -46,15 +46,15 @@ async function signUp(e) {
 async function signIn(e) { e.preventDefault(); const f=new FormData(e.currentTarget); try { await signInWithEmailAndPassword(auth,pseudoEmail(f.get('id')),f.get('password')); } catch { msg('#loginMessage','가입된 아이디와 비밀번호를 확인해 주세요.',true); } }
 
 async function createRoom(form) {
-const f=new FormData(form), title=f.get('title').trim(), start=dateTime(f.get('date'),f.get('start')), deadline=dateTime(f.get('deadlineDate'),f.get('deadlineTime')), cap=Number(f.get('capacity'));
+const f=new FormData(form), title=f.get('title').trim(), deadline=dateTime(f.get('deadlineDate'),f.get('deadlineTime')), cap=Number(f.get('capacity'));
   if(!title||!f.get('place').trim()||!f.get('content').trim()) throw new Error('모임 이름, 소개, 장소를 모두 입력해 주세요.');
-if(start<=now()||deadline>=start||cap<2) throw new Error('날짜·시간·마감·정원을 다시 확인해 주세요.');
+if(deadline<=now()||cap<2) throw new Error('모집 마감 날짜·시간과 정원을 다시 확인해 주세요.');
   const roomRef=doc(collection(db,'rooms')), hostPart=doc(db,`rooms/${roomRef.id}/participants/${me.uid}`), attendance=doc(db,`rooms/${roomRef.id}/attendance/${me.uid}`), userRef=doc(db,'users',me.uid);
   await runTransaction(db,async tx=>{
     const user=await tx.get(userRef); if(!user.exists()) throw new Error('프로필을 불러오지 못했습니다. 다시 로그인해 주세요.');
     await clearExpiredPenalty(tx,userRef);
     if(user.data().hostedRoomId) { const old=await tx.get(doc(db,'rooms',user.data().hostedRoomId)); if(old.exists() && !['completed','cancelled'].includes(old.data().status)) throw new Error('이전 개최 모임이 끝난 뒤 새 모임을 만들 수 있습니다.'); }
-const data={title,content:f.get('content').trim(),place:f.get('place').trim(),volunteerDate:f.get('date'),startTime:f.get('start'),startsAt:start,endsAt:null,deadlineAt:deadline,capacity:cap,participantCount:1,hostId:me.uid,hostName:myProfile.displayId,status:'recruiting',createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
+const data={title,content:f.get('content').trim(),place:f.get('place').trim(),volunteerDate:f.get('deadlineDate'),startTime:f.get('deadlineTime'),endTime:'',startsAt:null,endsAt:null,deadlineAt:deadline,capacity:cap,participantCount:1,hostId:me.uid,hostName:myProfile.displayId,status:'recruiting',createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
     tx.set(roomRef,data); tx.set(hostPart,{userId:me.uid,displayId:myProfile.displayId,role:'host',status:'pending',hasJoinedBefore:true,joinedAt:serverTimestamp()}); tx.set(attendance,{userId:me.uid,status:'pending',updatedAt:serverTimestamp()}); tx.update(userRef,{hostedRoomId:roomRef.id,activeRoomId:roomRef.id});
   }); await audit('room-created',roomRef.id); closeModal(); notice('봉사 모임을 만들었습니다.');
 }
@@ -99,5 +99,6 @@ async function openWeather(){
   } catch(err) { modal('⚠','GWANGALLI WEATHER','광안리 기상상황','실시간 날씨 정보를 불러오지 못했습니다.',`<p class="weather-tip">인터넷 연결을 확인한 뒤 다시 시도해 주세요.</p><a class="secondary-action weather-link" target="_blank" rel="noopener" href="https://www.google.com/search?q=%EA%B4%91%EC%95%88%EB%A6%AC+%EB%82%A0%EC%94%A8">Google에서 광안리 날씨 확인</a>`); }
 }
 function renderCalendar(){const m=new Date(), y=m.getFullYear(),mo=m.getMonth(),done=JSON.parse(localStorage.getItem('ploget-volunteer-days')||'[]');$('#calendarMonth').textContent=`${y}.${String(mo+1).padStart(2,'0')} 봉사 달력`;$('#calendarDays').innerHTML='<span></span>'.repeat(new Date(y,mo,1).getDay())+Array.from({length:new Date(y,mo+1,0).getDate()},(_,i)=>{const d=i+1,key=`${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;return `<span class="${done.includes(key)?'done':''}">${d}</span>`}).join('');}
+const startOnlyWhenFull=startRoom;startRoom=async(roomId,minutes)=>{if(minutes===undefined)return askStart(roomId);const room=await getDoc(doc(db,'rooms',roomId));if(!room.exists())return alert('모임 정보를 찾을 수 없습니다.');if(room.data().participantCount<room.data().capacity)return alert(`정원이 모두 찬 뒤에 실행할 수 있습니다. (${room.data().participantCount}/${room.data().capacity}명)`);return startOnlyWhenFull(roomId,minutes);};
 function bind(){ $('#showSignup').onclick=()=>{$('#startLoginForm').classList.add('hidden');$('#signupForm').classList.remove('hidden');};$('#showLogin').onclick=()=>{$('#signupForm').classList.add('hidden');$('#startLoginForm').classList.remove('hidden');};$('#startLoginForm').onsubmit=signIn;$('#signupForm').onsubmit=signUp;$('.close').onclick=closeModal;$('#activityModal').onclick=e=>{if(e.target===$('#activityModal'))closeModal();};document.querySelectorAll('.menu-card').forEach(b=>b.onclick=()=>({봉사참여:openVolunteer,후속활동:openFollowup,기상상황:openWeather,포인트조회:openPoints}[b.dataset.name]()));}
 bind();document.addEventListener('click',async e=>{if(e.target?.id!=='cameraCapture')return;bagVerified=false;const img=$('#certifyPreview');await new Promise(resolve=>setTimeout(resolve,0));if(!img?.src)return;await new Promise(resolve=>img.complete&&img.naturalWidth?resolve():img.addEventListener('load',resolve,{once:true}));$('#cameraStatus').textContent='종량제봉투를 판별하는 중입니다.';await checkBagInPhoto(img);});$('#logoutButton').onclick=async()=>{await signOut(auth);closeModal();notice('로그아웃되었습니다.');};renderCalendar();await setPersistence(auth,inMemoryPersistence);await signOut(auth);onAuthStateChanged(auth,async user=>{me=user;if(!user){$('#logoutButton').classList.add('hidden');$('#startLogin').classList.remove('hidden');return;}await profile();$('#logoutButton').classList.remove('hidden');$('#startLogin').classList.add('hidden');notice(`${myProfile?.displayId||'회원'}님, 플로겟에 오신 것을 환영해요.`);});
