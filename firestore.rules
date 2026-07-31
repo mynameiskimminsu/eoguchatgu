@@ -8,7 +8,7 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if signedIn();
       allow create: if me(uid);
-      allow update: if me(uid) && request.resource.data.normalizedId == resource.data.normalizedId && request.resource.data.points >= resource.data.points && request.resource.data.points <= resource.data.points + 500;
+      allow update: if me(uid) && request.resource.data.normalizedId == resource.data.normalizedId && request.resource.data.points >= resource.data.points && request.resource.data.points <= resource.data.points + 5000;
     }
     match /usernames/{id} { allow read: if signedIn(); allow create: if signedIn() && request.resource.data.uid == request.auth.uid; allow update: if me(resource.data.uid); }
     match /rooms/{roomId} {
