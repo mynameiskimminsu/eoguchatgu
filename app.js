@@ -30,7 +30,7 @@ async function clearExpiredPenalty(tx, userRef) {
 }
 
 async function signUp(e) {
-  e.preventDefault(); const f=new FormData(e), id=normal(f.get('id')), pw=f.get('password');
+  e.preventDefault(); const f=new FormData(e.currentTarget), id=normal(f.get('id')), pw=f.get('password');
   if (!/^[a-z0-9_.-]{2,20}$/.test(id)) return msg('#signupMessage','아이디는 영문·숫자·._- 2~20자로 입력해 주세요.',true);
   if (pw.length < 6) return msg('#signupMessage','비밀번호는 6자 이상으로 입력해 주세요.',true);
   if (pw !== f.get('confirm')) return msg('#signupMessage','비밀번호 확인이 일치하지 않습니다.',true);
@@ -42,7 +42,7 @@ async function signUp(e) {
     msg('#signupMessage','회원가입이 완료되었습니다.');
   } catch(err) { const text=err.code==='auth/email-already-in-use'?'이미 가입된 아이디입니다.':err.code==='auth/weak-password'?'비밀번호는 6자 이상으로 입력해 주세요.':err.code==='permission-denied'?'회원 정보 저장 권한이 없습니다. 잠시 뒤 다시 시도해 주세요.':`회원가입에 실패했습니다: ${err.message}`; msg('#signupMessage',text,true); }
 }
-async function signIn(e) { e.preventDefault(); const f=new FormData(e); try { await signInWithEmailAndPassword(auth,pseudoEmail(f.get('id')),f.get('password')); } catch { msg('#loginMessage','가입된 아이디와 비밀번호를 확인해 주세요.',true); } }
+async function signIn(e) { e.preventDefault(); const f=new FormData(e.currentTarget); try { await signInWithEmailAndPassword(auth,pseudoEmail(f.get('id')),f.get('password')); } catch { msg('#loginMessage','가입된 아이디와 비밀번호를 확인해 주세요.',true); } }
 
 async function createRoom(form) {
   const f=new FormData(form), title=f.get('title').trim(), start=dateTime(f.get('date'),f.get('start')), end=dateTime(f.get('date'),f.get('end')), deadline=dateTime(f.get('deadlineDate'),f.get('deadlineTime')), cap=Number(f.get('capacity'));
