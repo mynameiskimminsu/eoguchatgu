@@ -18,7 +18,7 @@ const msg = (id,text,error=false) => { const el=$(id); el.textContent=text; el.s
 
 function modal(icon,label,title,description,html='') {
   $('#modalIcon').textContent=icon; $('#modalLabel').textContent=label; $('#modalTitle').textContent=title;
-  $('#modalDescription').textContent=title==='봉사활동 개최'?'모집 마감만 설정하세요. 정원이 모두 차면 방장이 실제 봉사 시간을 정해 실행합니다.':description; $('#modalInfo').innerHTML=html; $('#modalInfo').querySelector('input[name="end"]')?.closest('label')?.remove(); $('#modalInfo').querySelector('input[name="start"]')?.closest('label')?.remove(); $('#modalActions').innerHTML='';
+  $('#modalDescription').textContent=title==='봉사활동 개최'?'모집 마감만 설정하세요. 정원이 모두 차면 방장이 실제 봉사 시간을 정해 실행합니다.':description; $('#modalInfo').innerHTML=html; ['end','start','date'].forEach(name=>$('#modalInfo').querySelector(`input[name="${name}"]`)?.closest('label')?.remove()); $('#modalActions').innerHTML='';
   $('#activityModal').classList.add('open'); $('#activityModal').setAttribute('aria-hidden','false');
 }
 function closeModal(){ if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;} if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;} $('#activityModal').classList.remove('open'); $('#activityModal').setAttribute('aria-hidden','true'); }
